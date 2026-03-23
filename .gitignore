@@ -1,0 +1,8 @@
+.vs/
+*.exe
+*.suo
+*.user
+*.db
+Debug/
+Release/
+x64/
