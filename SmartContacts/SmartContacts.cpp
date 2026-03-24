@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
 #include <vector>
@@ -108,37 +108,87 @@ bool validateDate(const Date& date) {
     return (date.day >= 1 && date.day <= maxDays);
 }
 
+void clearInput() {
+    cin.clear();
+    cin.ignore(10000, '\n');
+}
+
+// Функция для проверки, состоит ли строка только из цифр
+bool isOnlyDigits(const string& str) {
+    if (str.empty()) return false;
+    for (char c : str) {
+        if (c < '0' || c > '9') {
+            return false;
+        }
+    }
+    return true;
+}
+
 int inputInt(const string& prompt, int minVal = -1000000, int maxVal = 1000000) {
+    string input;
     int value;
+
     while (true) {
         cout << prompt;
-        cin >> value;
-        if (cin.fail() || value < minVal || value > maxVal) {
-            cin.clear();
-            cin.ignore(10000, '\n');
-            cout << "Ошибка! Введите число от " << minVal << " до " << maxVal << ": ";
+        getline(cin, input);
+
+        // Проверяем, что введены только цифры
+        if (!isOnlyDigits(input)) {
+            cout << "Ошибка! Введите только цифры, без букв.\n";
+            continue;
         }
-        else {
-            cin.ignore(10000, '\n');
+
+        // Преобразуем в число
+        try {
+            value = stoi(input);
+        }
+        catch (...) {
+            cout << "Ошибка! Некорректное число.\n";
+            continue;
+        }
+
+        if (value >= minVal && value <= maxVal) {
             return value;
         }
+
+        cout << "Ошибка! Число должно быть от " << minVal << " до " << maxVal << ".\n";
     }
 }
 
-long long inputLongLong(const string& prompt, long long minVal = 0) {
+long long inputLongLong(const string& prompt, long long minVal = 0, int minLength = 0) {
+    string input;
     long long value;
+
     while (true) {
         cout << prompt;
-        cin >> value;
-        if (cin.fail() || value < minVal) {
-            cin.clear();
-            cin.ignore(10000, '\n');
-            cout << "Ошибка! Введите положительное число: ";
+        getline(cin, input);
+
+        // Проверяем, что введены только цифры
+        if (!isOnlyDigits(input)) {
+            cout << "Ошибка! Номер телефона должен содержать только цифры.\n";
+            continue;
         }
-        else {
-            cin.ignore(10000, '\n');
+
+        // Проверяем минимальную длину номера
+        if (input.length() < minLength) {
+            cout << "Ошибка! Номер телефона должен содержать минимум " << minLength << " цифр.\n";
+            continue;
+        }
+
+        // Преобразуем в число
+        try {
+            value = stoll(input);
+        }
+        catch (...) {
+            cout << "Ошибка! Некорректный номер.\n";
+            continue;
+        }
+
+        if (value >= minVal) {
             return value;
         }
+
+        cout << "Ошибка! Число должно быть не меньше " << minVal << ".\n";
     }
 }
 
@@ -171,7 +221,7 @@ Contact inputContact() {
     do {
         c.phone.countryCode = inputInt("Код страны (1-999): ", 1, 999);
         c.phone.cityCode = inputInt("Код города (0-999): ", 0, 999);
-        c.phone.number = inputLongLong("Номер телефона: ", 0);
+        c.phone.number = inputLongLong("Номер телефона (минимум 8 цифр): ", 0, 8);
 
         if (!validatePhone(c.phone)) {
             cout << "Неверный формат телефона! Повторите ввод.\n";
